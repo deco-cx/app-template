@@ -16,8 +16,8 @@ export interface Props {
   account: string;
 
   /**
-   * @title Wake API token
-   * @description The token for accessing wake commerce
+   * @title API token
+   * @description The token for accessing your API
    */
   token?: Secret;
 }
@@ -64,7 +64,7 @@ export const preview = () => {
       name: "App Template",
       owner: "deco.cx",
       description: "This is an template of an app to be used as a reference.",
-      logo: "",
+      logo: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8",
       images: [],
       tabs: [],
     },

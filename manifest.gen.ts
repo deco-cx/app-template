@@ -8,15 +8,15 @@ import * as $$$$$$0 from "./sections/mySection.tsx";
 
 const manifest = {
   "loaders": {
-    "unknown/loaders/myLoader.ts": $$$0,
+    "app-template/loaders/myLoader.ts": $$$0,
   },
   "sections": {
-    "unknown/sections/mySection.tsx": $$$$$$0,
+    "app-template/sections/mySection.tsx": $$$$$$0,
   },
   "actions": {
-    "unknown/actions/myAction.ts": $$$$$$$$$0,
+    "app-template/actions/myAction.ts": $$$$$$$$$0,
   },
-  "name": "unknown",
+  "name": "app-template",
   "baseUrl": import.meta.url,
 };
 

@@ -2,11 +2,15 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$0 from "./sections/mySection.tsx";
+import * as $$$$$$1 from "./sections/container/Container.tsx";
+import * as $$$$$$0 from "./sections/Content/Breadcrumb.tsx";
+import * as $$$$$$2 from "./sections/mySection.tsx";
 
 const manifest = {
   "sections": {
-    "elux-components-app/sections/mySection.tsx": $$$$$$0,
+    "elux-components-app/sections/container/Container.tsx": $$$$$$1,
+    "elux-components-app/sections/Content/Breadcrumb.tsx": $$$$$$0,
+    "elux-components-app/sections/mySection.tsx": $$$$$$2,
   },
   "name": "elux-components-app",
   "baseUrl": import.meta.url,

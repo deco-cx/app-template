@@ -2,21 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/myAction.ts";
-import * as $$$0 from "./loaders/myLoader.ts";
 import * as $$$$$$0 from "./sections/mySection.tsx";
 
 const manifest = {
-  "loaders": {
-    "app-template/loaders/myLoader.ts": $$$0,
-  },
   "sections": {
-    "app-template/sections/mySection.tsx": $$$$$$0,
+    "elux-components-app/sections/mySection.tsx": $$$$$$0,
   },
-  "actions": {
-    "app-template/actions/myAction.ts": $$$$$$$$$0,
-  },
-  "name": "app-template",
+  "name": "elux-components-app",
   "baseUrl": import.meta.url,
 };
 

@@ -42,7 +42,7 @@
       "check": "deno fmt && deno lint && deno check **/mod.ts",
       "release": "deno eval 'import \"deco/scripts/release.ts\"'",
       "start": "deno task bundle",
-      "bundle": "deno run -A jsr:@deco/deco/scripts/bundle app-template",
+      "bundle": "deno run -A jsr:@deco/deco/scripts/bundle elux-components-app",
       "link": "deno eval 'import \"deco/scripts/apps/link.ts\"'",
       "unlink": "deno eval 'import \"deco/scripts/apps/unlink.ts\"'",
       "serve": "deno eval 'import \"deco/scripts/apps/serve.ts\"'",

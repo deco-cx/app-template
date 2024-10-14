@@ -33,11 +33,11 @@ export const preview = () => {
   return {
     Component: PreviewContainer,
     props: {
-      name: "App Template",
+      name: "Elux Global Sections",
       owner: "deco.cx",
-      description: "This is an template of an app to be used as a reference.",
+      description: "Use global sections in all Elux sites",
       logo:
-        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8",
+        "https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png",
       images: [],
       tabs: [],
     },

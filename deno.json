@@ -35,7 +35,9 @@
     "@std/cli": "jsr:@std/cli@^1.0.3",
     "@zaubrik/djwt": "jsr:@zaubrik/djwt@^3.0.2",
     "fast-json-patch": "npm:fast-json-patch@^3.1.1",
-    "simple-git": "npm:simple-git@^3.25.0"
+    "simple-git": "npm:simple-git@^3.25.0",
+    "drizzle-orm": "https://esm.sh/drizzle-orm@0.30.10",
+    "drizzle-orm/": "https://esm.sh/drizzle-orm@0.30.10/"
   },
   "lock": false,
   "tasks": {

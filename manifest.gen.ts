@@ -2,15 +2,23 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$1 from "./sections/container/Container.tsx";
-import * as $$$$$$0 from "./sections/Content/Breadcrumb.tsx";
-import * as $$$$$$2 from "./sections/mySection.tsx";
+import * as $$$$$$0 from "./sections/Component.tsx";
+import * as $$$$$$5 from "./sections/container/Container.tsx";
+import * as $$$$$$1 from "./sections/Content/Breadcrumb.tsx";
+import * as $$$$$$2 from "./sections/Institutional/Policy.tsx";
+import * as $$$$$$3 from "./sections/Institutional/Support.tsx";
+import * as $$$$$$4 from "./sections/Institutional/WhereToBuy.tsx";
+import * as $$$$$$6 from "./sections/mySection.tsx";
 
 const manifest = {
   "sections": {
-    "elux-components-app/sections/container/Container.tsx": $$$$$$1,
-    "elux-components-app/sections/Content/Breadcrumb.tsx": $$$$$$0,
-    "elux-components-app/sections/mySection.tsx": $$$$$$2,
+    "elux-components-app/sections/Component.tsx": $$$$$$0,
+    "elux-components-app/sections/container/Container.tsx": $$$$$$5,
+    "elux-components-app/sections/Content/Breadcrumb.tsx": $$$$$$1,
+    "elux-components-app/sections/Institutional/Policy.tsx": $$$$$$2,
+    "elux-components-app/sections/Institutional/Support.tsx": $$$$$$3,
+    "elux-components-app/sections/Institutional/WhereToBuy.tsx": $$$$$$4,
+    "elux-components-app/sections/mySection.tsx": $$$$$$6,
   },
   "name": "elux-components-app",
   "baseUrl": import.meta.url,

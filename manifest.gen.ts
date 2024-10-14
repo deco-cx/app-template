@@ -3,27 +3,33 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/contact/submit.ts";
+import * as $$$0 from "./loaders/menu.ts";
 import * as $$$$$$0 from "./sections/Component.tsx";
-import * as $$$$$$7 from "./sections/container/Container.tsx";
+import * as $$$$$$8 from "./sections/container/Container.tsx";
 import * as $$$$$$1 from "./sections/Content/Breadcrumb.tsx";
 import * as $$$$$$2 from "./sections/Content/Toast.tsx";
-import * as $$$$$$3 from "./sections/Institutional/Policy.tsx";
-import * as $$$$$$4 from "./sections/Institutional/Support.tsx";
-import * as $$$$$$5 from "./sections/Institutional/WhereToBuy.tsx";
-import * as $$$$$$8 from "./sections/mySection.tsx";
-import * as $$$$$$6 from "./sections/Social/ContactForm.tsx";
+import * as $$$$$$3 from "./sections/Header/Header.tsx";
+import * as $$$$$$4 from "./sections/Institutional/Policy.tsx";
+import * as $$$$$$5 from "./sections/Institutional/Support.tsx";
+import * as $$$$$$6 from "./sections/Institutional/WhereToBuy.tsx";
+import * as $$$$$$9 from "./sections/mySection.tsx";
+import * as $$$$$$7 from "./sections/Social/ContactForm.tsx";
 
 const manifest = {
+  "loaders": {
+    "elux-components-app/loaders/menu.ts": $$$0,
+  },
   "sections": {
     "elux-components-app/sections/Component.tsx": $$$$$$0,
-    "elux-components-app/sections/container/Container.tsx": $$$$$$7,
+    "elux-components-app/sections/container/Container.tsx": $$$$$$8,
     "elux-components-app/sections/Content/Breadcrumb.tsx": $$$$$$1,
     "elux-components-app/sections/Content/Toast.tsx": $$$$$$2,
-    "elux-components-app/sections/Institutional/Policy.tsx": $$$$$$3,
-    "elux-components-app/sections/Institutional/Support.tsx": $$$$$$4,
-    "elux-components-app/sections/Institutional/WhereToBuy.tsx": $$$$$$5,
-    "elux-components-app/sections/mySection.tsx": $$$$$$8,
-    "elux-components-app/sections/Social/ContactForm.tsx": $$$$$$6,
+    "elux-components-app/sections/Header/Header.tsx": $$$$$$3,
+    "elux-components-app/sections/Institutional/Policy.tsx": $$$$$$4,
+    "elux-components-app/sections/Institutional/Support.tsx": $$$$$$5,
+    "elux-components-app/sections/Institutional/WhereToBuy.tsx": $$$$$$6,
+    "elux-components-app/sections/mySection.tsx": $$$$$$9,
+    "elux-components-app/sections/Social/ContactForm.tsx": $$$$$$7,
   },
   "actions": {
     "elux-components-app/actions/contact/submit.ts": $$$$$$$$$0,

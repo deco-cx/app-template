@@ -3,7 +3,10 @@ import { clx } from "../../utils/clx.ts";
 import { useId } from "../../sdk/useId.ts";
 import Icon from "../ui/Icon.tsx";
 import { useScript } from "@deco/deco/hooks";
-function Dropdown({ icon, title, links }: ExtraMenu) {
+import { TEXT_COLORS } from "../../utils/constants.tsx";
+function Dropdown(
+  { icon, title, links, textColor, iconColor, textSize, fontWeight }: ExtraMenu,
+) {
   const id = useId();
   const setup = (id: string) => {
     const dropdown = document.getElementById(id) as HTMLUListElement;
@@ -18,11 +21,24 @@ function Dropdown({ icon, title, links }: ExtraMenu) {
         class="flex justify-between items-center h-[38px]"
       >
         <div class="flex items-center gap-2">
-          {icon && <Icon id={icon} />}
-          <p class="text-sm font-semibold">{title}</p>
+          {icon && (
+            <Icon id={icon} class={iconColor && TEXT_COLORS[iconColor]} />
+          )}
+          <p
+            class={clx(
+              textColor && TEXT_COLORS[textColor],
+              textSize ?? "text-sm",
+              fontWeight ?? "font-semibold",
+            )}
+          >
+            {title}
+          </p>
         </div>
         <Icon
-          class="text-primary rotate-90 group-hover:-rotate-90 duration-150 ease-in-out"
+          class={clx(
+            "rotate-90 group-hover:-rotate-90 duration-150 ease-in-out",
+            TEXT_COLORS[iconColor ?? "primary"],
+          )}
           id="chevron-right"
         />
       </div>
@@ -37,15 +53,24 @@ function Dropdown({ icon, title, links }: ExtraMenu) {
           boxShadow: "0px 2px 4px 0px #56697326",
         }}
       >
-        {links.map(({ link, title, icon, isBlank }) => (
-          <li class="w-full hover:bg-base-200 !px-4">
+        {links.map((
+          { link, title, icon, isBlank, textColor, textSize, fontWeight },
+        ) => (
+          <li
+            class={clx(
+              "w-full hover:bg-base-200 !px-4 cursor-pointer",
+              textColor && TEXT_COLORS[textColor],
+              textSize ?? "text-sm",
+              fontWeight ?? "font-semibold",
+            )}
+          >
             <a
-              class="min-w-max flex items-center w-max h-[38px] hover:!bg-transparent font-semibold text-sm gap-2.5"
+              class="min-w-max flex items-center w-max h-[38px] hover:!bg-transparent gap-2.5"
               href={link}
               target={isBlank ? "_blank" : "_self"}
               rel={isBlank ? "noopener noreferrer" : ""}
             >
-              {icon && <Icon id={icon} size={24} />}
+              {icon && <Icon id={icon} size={16} />}
               <p>{title}</p>
             </a>
           </li>

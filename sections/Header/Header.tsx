@@ -2,7 +2,9 @@ import type { ImageWidget } from "apps/admin/widgets.ts";
 import Image from "apps/website/components/Image.tsx";
 import Icon from "../../components/ui/Icon.tsx";
 import {
+  BG_COLORS,
   HEADER_HEIGHT_DESKTOP,
+  HEADER_HEIGHT_DESKTOP_NO_SECONDARY,
   HEADER_HEIGHT_MOBILE,
 } from "../../utils/constants.tsx";
 import { useDevice } from "@deco/deco/hooks";
@@ -10,6 +12,8 @@ import { Menu as MenuProps } from "../../loaders/menu.ts";
 import Dropdown from "../../components/header/Dropdown.tsx";
 import NavItem from "../../components/header/NavItem.tsx";
 import Menu from "../../components/header/Menu.tsx";
+import { Colors } from "../../utils/types.ts";
+import { clx } from "../../utils/clx.ts";
 export interface Logo {
   src: ImageWidget;
   alt: string;
@@ -20,10 +24,12 @@ export interface SectionProps {
   /** @title Logo */
   logo: Logo;
   menu: MenuProps;
+  backgroundColor?: Colors;
 }
 
-type Props = Omit<SectionProps, "alert">;
+type Props = SectionProps;
 const Desktop = ({ logo, menu }: Props) => {
+  const hideSecondaryMenu = menu.hideSecondaryMenu;
   return (
     <>
       <div class="flex flex-col gap-4  max-w-[1280px] mx-auto h-[70px]">
@@ -37,26 +43,46 @@ const Desktop = ({ logo, menu }: Props) => {
             />
           </a>
           <div class="flex justify-start items-center gap-6">
+            {hideSecondaryMenu && (
+              <div>
+                <label
+                  htmlFor="open-menu"
+                  class="cursor-pointer text-white text-sm flex flex-row font-medium"
+                >
+                  <p>{menu.allCategoriesText}</p>{" "}
+                  <Icon
+                    class={clx(
+                      "rotate-90 group-has-[#open-menu:checked]/header:-rotate-90 duration-150 ease-in-out",
+                      "text-white",
+                    )}
+                    id="chevron-right"
+                  />
+                </label>
+                <Menu {...menu} />
+              </div>
+            )}
             {menu.extraLinks?.map((props) => <Dropdown {...props} />)}
-            <Dropdown {...menu.languages} />
+            {!menu.languages.hide && <Dropdown {...menu.languages} />}
           </div>
         </div>
       </div>
-      <div class="bg-base-200 h-[72px]">
-        <ul class="flex justify-start h-full max-w-[1280px] mx-auto text-sm text-secondary font-semibold">
-          <li class="relative w-[182px]">
-            <label
-              htmlFor="open-menu"
-              class="flex items-center justify-center h-full w-[182px] gap-2 cursor-pointer"
-            >
-              <Icon class="text-primary" id="menu" />
-              <p>{menu.allCategoriesText}</p>
-            </label>
-            <Menu {...menu} />
-          </li>
-          {menu.links.map((props) => <NavItem {...props} />)}
-        </ul>
-      </div>
+      {!hideSecondaryMenu && (
+        <div class="bg-base-200 h-[72px]">
+          <ul class="flex justify-start h-full max-w-[1280px] mx-auto text-sm text-secondary font-semibold">
+            <li class="relative w-[182px]">
+              <label
+                htmlFor="open-menu"
+                class="flex items-center justify-center h-full w-[182px] gap-2 cursor-pointer"
+              >
+                <Icon class="text-primary" id="menu" />
+                <p>{menu.allCategoriesText}</p>
+              </label>
+              <Menu {...menu} />
+            </li>
+            {menu.links.map((props) => <NavItem {...props} />)}
+          </ul>
+        </div>
+      )}
       <input id="open-menu" type="checkbox" class="hidden" />
     </>
   );
@@ -89,7 +115,7 @@ const Mobile = ({ logo, menu }: Props) => (
             </a>
           )}
         </div>
-        <Dropdown {...menu.languages} />
+        {!menu.languages.hide && <Dropdown {...menu.languages} />}
       </div>
     </div>
     <Menu.Mobile {...menu} />
@@ -104,18 +130,27 @@ function Header({
     height: 16,
     alt: "Logo",
   },
+  backgroundColor,
   ...props
 }: Props) {
   const device = useDevice();
+  const hideSecondaryMenu = props.menu.hideSecondaryMenu;
   return (
     <header
       style={{
         height: device === "desktop"
-          ? HEADER_HEIGHT_DESKTOP
+          ? hideSecondaryMenu
+            ? HEADER_HEIGHT_DESKTOP_NO_SECONDARY
+            : HEADER_HEIGHT_DESKTOP
           : HEADER_HEIGHT_MOBILE,
       }}
     >
-      <div class="group/header bg-base-100 fixed w-full z-40">
+      <div
+        class={clx(
+          "group/header bg-base-100 fixed w-full z-40",
+          BG_COLORS[backgroundColor ?? "white"],
+        )}
+      >
         {device === "desktop"
           ? <Desktop logo={logo} {...props} />
           : <Mobile logo={logo} {...props} />}

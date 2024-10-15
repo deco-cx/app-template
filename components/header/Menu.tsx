@@ -1,5 +1,9 @@
 import Icon from "../../components/ui/Icon.tsx";
-import { NAVBAR_HEIGHT_DESKTOP } from "../../utils/constants.tsx";
+import {
+  HEADER_HEIGHT_DESKTOP_NO_SECONDARY,
+  NAVBAR_HEIGHT_DESKTOP,
+  TEXT_COLORS,
+} from "../../utils/constants.tsx";
 import type { ExtraMenu, Menu as MenuProps } from "../../loaders/menu.ts";
 import { clx } from "../../utils/clx.ts";
 import { useId } from "../../sdk/useId.ts";
@@ -47,7 +51,7 @@ const MenuMobile = ({ links, extraLinks, mobile, menuText }: MenuProps) => {
         )}
       >
         <div class="h-[52px] bg-primary w-full p-2 flex items-center justify-between pl-4">
-          <Image src={mobile.logo} width={120} height={14} />
+          <Image src={mobile.logo} width={140} height={32} />
           <label
             class="h-9 w-9 flex items-center justify-center"
             htmlFor={"open-menu"}
@@ -104,7 +108,7 @@ const MenuMobile = ({ links, extraLinks, mobile, menuText }: MenuProps) => {
                         )}
                       >
                         <div class="h-[52px] bg-primary w-full p-2 flex items-center justify-between pl-4">
-                          <Image src={mobile.logo} width={120} height={14} />
+                          <Image src={mobile.logo} width={140} height={32} />
                           <label
                             htmlFor={id}
                             class="h-9 flex gap-2 items-center justify-between"
@@ -136,7 +140,7 @@ const MenuMobile = ({ links, extraLinks, mobile, menuText }: MenuProps) => {
     </>
   );
 };
-function Menu({ links, menuText }: MenuProps) {
+function Menu({ links, menuText, hideSecondaryMenu }: MenuProps) {
   const { Radio } = useRadio("menu-desk");
   return (
     <>
@@ -145,7 +149,11 @@ function Menu({ links, menuText }: MenuProps) {
           "opacity-0 group-has-[#open-menu:checked]/header:opacity-100",
           "group-has-[#open-menu:checked]/header:pointer-events-auto pointer-events-none left-3 absolute z-50",
         )}
-        style={{ top: NAVBAR_HEIGHT_DESKTOP }}
+        style={{
+          top: !hideSecondaryMenu
+            ? NAVBAR_HEIGHT_DESKTOP
+            : HEADER_HEIGHT_DESKTOP_NO_SECONDARY,
+        }}
       >
         <div class="flex flex-col gap-2 bg-white w-[296px] h-[568px] rounded-b-[4px] py-6 px-8 relative">
           <p class="flex items-center h-9 text-base font-bold text-primary">
@@ -168,8 +176,8 @@ function Menu({ links, menuText }: MenuProps) {
                   <a
                     class={clx(
                       "text-base font-normal leading-none h-[54px] px-2 flex justify-between items-center peer-checked:bg-base-200 border-b border-base-200",
+                      color && TEXT_COLORS[color],
                     )}
-                    style={{ color: color }}
                     href={link}
                     target={isBlank ? "_blank" : "_self"}
                     rel={isBlank ? "noopener noreferrer" : ""}
@@ -207,6 +215,7 @@ function Menu({ links, menuText }: MenuProps) {
         class={clx(
           "h-screen w-screen fixed",
           "group-has-[#open-menu:checked]/header:pointer-events-auto pointer-events-none ",
+          hideSecondaryMenu && "mt-5.5",
         )}
         style={{ left: 0 }}
       >

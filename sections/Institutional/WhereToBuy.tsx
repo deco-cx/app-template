@@ -1,10 +1,14 @@
 import { ImageWidget } from "apps/admin/widgets.ts";
 import Icon, { AvailableIcons } from "../../components/ui/Icon.tsx";
 import {
+  BORDER_CLASSES,
+  BORDER_COLORS,
   HOVER_BG_COLORS,
   HOVER_BORDER_COLORS,
+  HOVER_TEXT_COLORS,
   PEER_CHECKED_BG_COLORS,
   PEER_CHECKED_BORDER_COLORS,
+  PEER_CHECKED_TEXT_COLORS,
   TEXT_COLORS,
   WHERE_TO_BUY_CONTENT_ID,
 } from "../../utils/constants.tsx";
@@ -64,7 +68,7 @@ interface CountryCardContent {
   /**
    * @title Country flag
    */
-  icon: AvailableIcons;
+  icon?: AvailableIcons;
   /**
    * @title Country avaliable stores
    */
@@ -108,6 +112,20 @@ interface CountryCardStyle {
    * @description text-xs: 12px, text-sm: 14px, text-base: 16px, text-lg: 18px, text-xl: 20px, text-2xl: 24px, text-3xl: 30px
    */
   fontSize: FontSize;
+  /**
+   * @title Border color
+   * @description Default border color
+   */
+  colorBorder?: Colors;
+  /**
+   * @title Border width
+   */
+  borderWidth?: "1" | "2";
+  /**
+   * @title Hover Font color
+   * @description Font color when hover country card
+   */
+  hoverFontColor?: Colors;
   /**
    * @title Hover color
    * @description Bg color when hover country card
@@ -209,13 +227,24 @@ export default function Support(
               />
               <label
                 class={clx(
-                  "flex flex-col gap-1 border border-neutral px-4 pb-2.5 pt-3.5 font-light rounded-sm cursor-pointer peer-checked:font-normal hover:font-normal peer-checked:pointer-events-none",
+                  "flex flex-col gap-1 font-light rounded-sm cursor-pointer peer-checked:font-medium hover:font-medium peer-checked:pointer-events-none",
                   TEXT_COLORS[countryCardStyle.fontColor],
                   countryCardStyle.fontSize,
                   HOVER_BG_COLORS[countryCardStyle.hoverColor],
                   HOVER_BORDER_COLORS[countryCardStyle.hoverColorBorder],
                   PEER_CHECKED_BG_COLORS[countryCardStyle.hoverColor],
                   PEER_CHECKED_BORDER_COLORS[countryCardStyle.hoverColorBorder],
+                  BORDER_COLORS[countryCardStyle?.colorBorder ?? "neutral"],
+                  BORDER_CLASSES.full[countryCardStyle.borderWidth ?? "1"],
+                  HOVER_TEXT_COLORS[
+                    countryCardStyle.hoverFontColor ??
+                      countryCardStyle.fontColor
+                  ],
+                  PEER_CHECKED_TEXT_COLORS[
+                    countryCardStyle.hoverFontColor ??
+                      countryCardStyle.fontColor
+                  ],
+                  icon ? "px-4 pb-2.5 pt-3.5" : "px-6 py-3.5",
                 )}
                 for={id}
                 hx-trigger="click"
@@ -227,9 +256,9 @@ export default function Support(
                   stores: countryStores,
                 })}
               >
-                <Icon id={icon} width={20} height={15} />
+                {icon && <Icon id={icon} width={20} height={15} />}
                 <div class="relative">
-                  <span class="invisible font-normal">{label}</span>
+                  <span class="invisible font-medium">{label}</span>
                   <span class="absolute left-0 top-0">
                     {label}
                   </span>

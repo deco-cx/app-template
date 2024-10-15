@@ -46,7 +46,11 @@ export type AvailableIcons =
   | "guatemala-frigidaire"
   | "honduras-frigidaire"
   | "nicaragua-frigidaire"
-  | "panama-frigidaire";
+  | "panama-frigidaire"
+  | "bag-frigidaire"
+  | "tool-frigidaire"
+  | "book-frigidaire"
+  | "heart-frigidaire";
 
 interface Props extends JSX.SVGAttributes<SVGSVGElement> {
   /**

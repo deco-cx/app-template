@@ -1,5 +1,6 @@
 import type { Column, NavItem } from "../../loaders/menu.ts";
 import { clx } from "../../utils/clx.ts";
+import { TEXT_COLORS } from "../../utils/constants.tsx";
 import Icon from "../ui/Icon.tsx";
 
 const Item = ({ title, link, isBlank }: NavItem) => {
@@ -38,7 +39,9 @@ function Column({ categories }: Column) {
               {category?.icon && (
                 <Icon class="text-primary" id={category.icon} />
               )}
-              <p>
+              <p
+                class={category.titleColor && TEXT_COLORS[category.titleColor]}
+              >
                 {category.title}
               </p>
             </a>

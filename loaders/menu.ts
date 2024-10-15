@@ -1,6 +1,7 @@
 import { ImageWidget } from "apps/admin/widgets.ts";
 import { AppContext } from "../mod.ts";
 import { AvailableIcons } from "../components/ui/Icon.tsx";
+import { Colors, FontSize, FontWeight } from "../utils/types.ts";
 
 /** @titleBy title */
 export interface NavItem {
@@ -28,6 +29,7 @@ export interface Category {
   isBlank?: boolean;
   /** @title Nav items */
   navItems: NavItem[];
+  titleColor?: Colors;
 }
 
 /**
@@ -48,10 +50,9 @@ export interface Department {
   /** @title Title */
   title: string;
   /**
-   * @format color-input
    * @title Title color
    */
-  color?: string;
+  color?: Colors;
   link: string;
   /** @title Open in new tab */
   isBlank?: boolean;
@@ -70,6 +71,12 @@ export interface ExtraLink {
   link: string;
   /** @title Is a new tab? */
   isBlank?: boolean;
+  /** @description Color of the menu text */
+  textColor?: Colors;
+  /** @description Color of the menu icon */
+  textSize?: FontSize;
+  /** @description Font weight text */
+  fontWeight?: FontWeight;
 }
 
 /** @titleBy title */
@@ -81,6 +88,14 @@ export interface ExtraMenu {
   /** @title Title */
   title: string;
   links: ExtraLink[];
+  /** @description Color of the menu text */
+  textColor?: Colors;
+  /** @description Color of the menu icon */
+  iconColor?: Colors;
+  /** @description Size of the menu text */
+  textSize?: FontSize;
+  /** @description Font weight text */
+  fontWeight?: FontWeight;
 }
 
 export interface Mobile {
@@ -93,7 +108,9 @@ export interface Menu {
   /** @title Extra links */
   extraLinks?: ExtraMenu[];
   /** @title Languages */
-  languages: ExtraMenu;
+  languages: ExtraMenu & { hide?: boolean };
+  /** @description Hide the secondary gray menu */
+  hideSecondaryMenu?: boolean;
   /** @description This field is to render the right name of the btn in desktop that open the menu */
   allCategoriesText: string;
   mobile: Mobile;
@@ -105,7 +122,9 @@ export interface Props {
   /** @title Extra links */
   extraLinks?: ExtraMenu[];
   /** @title Languages */
-  languages: ExtraMenu;
+  languages: ExtraMenu & { hide?: boolean };
+  /** @description Hide the secondary gray menu */
+  hideSecondaryMenu?: boolean;
   /** @description This field is to render the right name of the btn in desktop that open the menu */
   allCategoriesText: string;
   menuText: string;

@@ -15,6 +15,7 @@ export const WISHLIST_FORM_ID = "wishlist-form";
 export const HEADER_HEIGHT_MOBILE = "64px";
 export const NAVBAR_HEIGHT_MOBILE = "56px";
 export const HEADER_HEIGHT_DESKTOP = "142px";
+export const HEADER_HEIGHT_DESKTOP_NO_SECONDARY = "70px";
 export const NAVBAR_HEIGHT_DESKTOP = "72px";
 
 export const WHERE_TO_BUY_CONTENT_ID = "where-to-buy-content";
@@ -146,6 +147,60 @@ export const TEXT_COLORS = {
   "black": "text-black",
   "white": "text-white",
   "transparent": "text-transparent",
+};
+
+export const HOVER_TEXT_COLORS = {
+  "base-100": "hover:!text-base-100",
+  "primary": "hover:!text-primary",
+  "secondary": "hover:!text-secondary",
+  "accent": "hover:!text-accent",
+  "neutral": "hover:!text-neutral",
+  "success": "hover:!text-success",
+  "warning": "hover:!text-warning",
+  "error": "hover:!text-error",
+  "info": "hover:!text-info",
+  "base-200": "hover:!text-base-200",
+  "base-300": "hover:!text-base-300",
+  "base-400": "hover:!text-base-400",
+  "base-content": "hover:!text-base-content",
+  "primary-content": "hover:!text-primary-content",
+  "secondary-content": "hover:!text-secondary-content",
+  "accent-content": "hover:!text-accent-content",
+  "neutral-content": "hover:!text-neutral-content",
+  "success-content": "hover:!text-success-content",
+  "warning-content": "hover:!text-warning-content",
+  "error-content": "hover:!text-error-content",
+  "info-content": "hover:!text-info-content",
+  "black": "hover:!text-black",
+  "white": "hover:!text-white",
+  "transparent": "hover:!text-transparent",
+};
+
+export const PEER_CHECKED_TEXT_COLORS = {
+  "base-100": "peer-checked:!text-base-100",
+  "primary": "peer-checked:!text-primary",
+  "secondary": "peer-checked:!text-secondary",
+  "accent": "peer-checked:!text-accent",
+  "neutral": "peer-checked:!text-neutral",
+  "success": "peer-checked:!text-success",
+  "warning": "peer-checked:!text-warning",
+  "error": "peer-checked:!text-error",
+  "info": "peer-checked:!text-info",
+  "base-200": "peer-checked:!text-base-200",
+  "base-300": "peer-checked:!text-base-300",
+  "base-400": "peer-checked:!text-base-400",
+  "base-content": "peer-checked:!text-base-content",
+  "primary-content": "peer-checked:!text-primary-content",
+  "secondary-content": "peer-checked:!text-secondary-content",
+  "accent-content": "peer-checked:!text-accent-content",
+  "neutral-content": "peer-checked:!text-neutral-content",
+  "success-content": "peer-checked:!text-success-content",
+  "warning-content": "peer-checked:!text-warning-content",
+  "error-content": "peer-checked:!text-error-content",
+  "info-content": "peer-checked:!text-info-content",
+  "black": "peer-checked:!text-black",
+  "white": "peer-checked:!text-white",
+  "transparent": "peer-checked:!text-transparent",
 };
 
 export const BG_COLORS = {

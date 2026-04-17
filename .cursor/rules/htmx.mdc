@@ -1,0 +1,274 @@
+---
+alwaysApply: false
+description: This file describes HTMX integration patterns and the useSection custom hook in Deco Framework.
+---
+
+# HTMX Integration in Deco Framework
+
+## What is HTMX?
+
+HTMX allows you to access modern browser features directly from HTML, making it easier to build interactive web applications with less JavaScript. In Deco Framework, HTMX is used for server interactions and dynamic content updates.
+
+## useSection Custom Hook
+
+The `useSection` hook automatically creates routes for rendering your UI states without requiring developers to handle routing manually. This is essential for HTMX-based interactivity.
+
+### Basic Usage
+
+```tsx
+import { useSection } from "deco/hooks/useSection.ts";
+
+export default function Section({ count = 0 }: { count: number }) {
+  return (
+    <div class="container h-screen flex items-center justify-center gap-4">
+      <button
+        hx-get={useSection({ props: { count: count - 1 } })}
+        hx-target="closest section"
+        hx-swap="outerHTML"
+        class="btn btn-sm btn-circle btn-outline no-animation"
+      >
+        <span>-</span>
+      </button>
+      <span>{count}</span>
+      <button
+        hx-get={useSection({ props: { count: count + 1 } })}
+        hx-target="closest section"
+        hx-swap="outerHTML"
+        class="btn btn-sm btn-circle btn-outline no-animation"
+      >
+        <span>+</span>
+      </button>
+    </div>
+  );
+}
+```
+
+### useSection with Complex State
+
+```tsx
+import { useSection } from "deco/hooks/useSection.ts";
+
+interface Props {
+  items: string[];
+  selectedIndex: number;
+  filter: string;
+}
+
+export default function FilterableList({ 
+  items = [], 
+  selectedIndex = 0, 
+  filter = "" 
+}: Props) {
+  const filteredItems = items.filter(item => 
+    item.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Filter items..."
+        hx-get={useSection({ 
+          props: { 
+            items, 
+            selectedIndex, 
+            filter: "" // Reset filter on input
+          } 
+        })}
+        hx-target="closest section"
+        hx-swap="outerHTML"
+        hx-trigger="input changed delay:300ms"
+        class="input input-bordered w-full"
+      />
+      
+      <ul class="menu">
+        {filteredItems.map((item, index) => (
+          <li key={index}>
+            <a
+              hx-get={useSection({ 
+                props: { 
+                  items, 
+                  selectedIndex: index, 
+                  filter 
+                } 
+              })}
+              hx-target="closest section"
+              hx-swap="outerHTML"
+              class={selectedIndex === index ? "active" : ""}
+            >
+              {item}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### useSection with Form Data
+
+```tsx
+import { useSection } from "deco/hooks/useSection.ts";
+
+interface Props {
+  name: string;
+  email: string;
+  message: string;
+  submitted: boolean;
+}
+
+export default function ContactForm({ 
+  name = "", 
+  email = "", 
+  message = "", 
+  submitted = false 
+}: Props) {
+  if (submitted) {
+    return (
+      <div class="alert alert-success">
+        <h3>Thank you for your message!</h3>
+        <p>We'll get back to you soon.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      hx-post={useSection({ 
+        props: { 
+          name: "", 
+          email: "", 
+          message: "", 
+          submitted: true 
+        } 
+      })}
+      hx-target="closest section"
+      hx-swap="outerHTML"
+      class="space-y-4"
+    >
+      <div>
+        <label class="label">
+          <span class="label-text">Name</span>
+        </label>
+        <input
+          type="text"
+          name="name"
+          value={name}
+          class="input input-bordered w-full"
+          required
+        />
+      </div>
+      
+      <div>
+        <label class="label">
+          <span class="label-text">Email</span>
+        </label>
+        <input
+          type="email"
+          name="email"
+          value={email}
+          class="input input-bordered w-full"
+          required
+        />
+      </div>
+      
+      <div>
+        <label class="label">
+          <span class="label-text">Message</span>
+        </label>
+        <textarea
+          name="message"
+          value={message}
+          class="textarea textarea-bordered w-full"
+          rows={4}
+          required
+        ></textarea>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">
+        Send Message
+      </button>
+    </form>
+  );
+}
+```
+
+## HTMX Event Reference
+
+### Common Events
+
+- `hx-on:click` - Click events
+- `hx-on:submit` - Form submission
+- `hx-on:change` - Input changes
+- `hx-on:blur` - Input blur
+- `hx-on:focus` - Input focus
+- `hx-on:load` - Page/component load
+
+### HTMX Attributes
+
+- `hx-get` - GET request
+- `hx-post` - POST request
+- `hx-put` - PUT request
+- `hx-delete` - DELETE request
+- `hx-target` - Target element for response
+- `hx-swap` - How to swap content (innerHTML, outerHTML, etc.)
+- `hx-trigger` - When to trigger (click, load, every 2s, etc.)
+- `hx-indicator` - Loading indicator element
+- `hx-confirm` - Confirmation dialog
+- `hx-prompt` - Prompt for user input
+
+### Swap Options
+
+- `innerHTML` - Replace inner content
+- `outerHTML` - Replace entire element
+- `beforebegin` - Insert before element
+- `afterbegin` - Insert at start of element
+- `beforeend` - Insert at end of element
+- `afterend` - Insert after element
+
+## Loading States with HTMX
+
+```tsx
+export default function DataLoader({ endpoint, id = `loader-${useId()}` }: Props) {
+  return (
+    <div id={id}>
+      <button
+        hx-get={endpoint}
+        hx-target={`#${id}-content`}
+        hx-swap="innerHTML"
+        hx-indicator={`#${id}-loading`}
+        class="btn-primary"
+      >
+        Load Data
+      </button>
+      
+      <div id={`${id}-loading`} class="htmx-indicator">
+        <div class="animate-pulse">Loading...</div>
+      </div>
+      
+      <div id={`${id}-content`}></div>
+    </div>
+  );
+}
+```
+
+## Best Practices for HTMX
+
+### ✅ Do
+
+- Use `useSection` for state management
+- Use HTMX for server interactions
+- Handle loading and error states with HTMX indicators
+- Use semantic HTML elements
+- Implement proper accessibility attributes
+- Use appropriate HTMX triggers (delay, throttle, etc.)
+
+### ❌ Don't
+
+- Use React/Preact hooks (useState, useEffect, useSignal, etc.)
+- Try to manage complex client-side state
+- Use event handlers directly in JSX (use HTMX instead)
+- Forget to handle loading and error states
+- Ignore accessibility requirements
+- Use external libraries for simple interactions

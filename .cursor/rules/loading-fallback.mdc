@@ -1,0 +1,125 @@
+---
+alwaysApply: false
+description: This file describes how to use Loading Fallback in sections.
+---
+### Loading Fallback
+
+- Loading fallbacks are a concept available to handle loading states of sections that use data from third-party APIs.
+- To create a loading fallback, export a component function named `LoadingFallback` in the section.
+- Use DaisyUI skeleton components to create beautiful and consistent loading states.
+
+#### When to use Loading Fallback
+
+- Only add loading fallbacks in sections that use external data sources, like:
+  - Shelves
+  - Product details
+  - Anything that is product-related
+- Or when the user explicitly requires it
+
+#### Pro tip: Default section as Loading Fallback
+
+- You can render your default section as a loading fallback
+- Use it in cases when there is no loader or integration in the section
+- This provides a consistent experience while data is being fetched
+
+Here an example of a Section with LoadingFallback:
+
+```tsx
+export interface Props {
+  title: string;
+}
+
+export function LoadingFallback() {
+  return (
+    <div class="flex flex-col gap-4">
+      <div class="skeleton h-8 w-48"></div>
+      <div class="flex gap-4">
+        <div class="skeleton h-32 w-32"></div>
+        <div class="skeleton h-32 w-32"></div>
+        <div class="skeleton h-32 w-32"></div>
+      </div>
+    </div>
+  );
+}
+
+export default function Section({ title = defaultProps.title }: Props) {
+  return <div>{title}</div>;
+}
+
+const defaultProps: Props = {
+  title: <generated>
+}
+```
+
+- Basic skeleton:
+  ```tsx
+  export function LoadingFallback() {
+    return <div class="skeleton h-32 w-32"></div>;
+  }
+  ```
+
+- Skeleton with circular content:
+  ```tsx
+  export function LoadingFallback() {
+    return (
+      <div class="flex w-52 flex-col gap-4">
+        <div class="flex items-center gap-4">
+          <div class="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+          <div class="flex flex-col gap-4">
+            <div class="skeleton h-4 w-20"></div>
+            <div class="skeleton h-4 w-28"></div>
+          </div>
+        </div>
+        <div class="skeleton h-32 w-full"></div>
+      </div>
+    );
+  }
+  ```
+
+- Skeleton for product list:
+  ```tsx
+  export function LoadingFallback() {
+    return (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array(8).fill(0).map((_, index) => (
+          <div key={index} class="card bg-base-100 shadow-xl">
+            <div class="skeleton h-48 w-full"></div>
+            <div class="card-body">
+              <div class="skeleton h-4 w-3/4"></div>
+              <div class="skeleton h-4 w-1/2"></div>
+              <div class="skeleton h-6 w-1/3"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  ```
+
+- Using default section as LoadingFallback:
+  ```tsx
+  //This props are not provenient from loaders.
+  export interface Props {
+    title: string;
+    images: Images[]
+  }
+
+  export function LoadingFallback(defaultProps: Props) {
+    // Render the default section with mock data
+    return <Section {...defaultProps} />;
+  }
+
+  export default function Section({ title = defaultProps.title, products = defaultProps.products }: Props) {
+    return (
+      <div>
+        <h2>{title}</h2>
+        {products?.map(product => <ProductCard product={product} />)}
+      </div>
+    );
+  }
+
+  const defaultProps: Props = {
+    title: <generated>,
+    products: <generated>
+  }
+  ```

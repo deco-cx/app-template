@@ -1,0 +1,459 @@
+---
+alwaysApply: false
+description: This file describes what is, and how to use components in deco framework.
+---
+
+# Components in Deco Framework
+
+> **Note:** For SSR patterns, HTMX integration, and script injection, see the [SSR Patterns guide](ssr.mdc).
+
+## Component Structure
+
+- Organize components in folders by functionality or type.
+- Keep components small and focused on a single responsibility.
+- Break down complex interfaces into reusable subcomponents.
+- Use TypeScript for props and function returns.
+
+## Props and Interfaces
+
+- Define all props in an interface named `Props`.
+- Document complex props with comments.
+- Provide default values for optional props.
+- Use specific types instead of generic ones (e.g., `string[]` instead of `any[]`).
+- Prefer interfaces for configuration objects and types for union types.
+
+## Reusability and Consistency
+
+- Extract shared logic to utilities and helper functions.
+- Maintain consistent naming patterns throughout the project.
+- Use the same export style across all components (default export for sections).
+- Keep event handlers and callback functions with clear and consistent names.
+- Use vanilla JS + HTMX for client-side interactivity.
+
+## Accessibility and Semantics
+
+- Use appropriate semantic HTML markup (e.g., `button` for buttons, `nav` for navigation).
+- Include `aria-*` and `role` attributes when necessary.
+- Ensure components are keyboard accessible.
+
+## Conditional Rendering
+
+- Use ternary operators for simple conditional rendering.
+- For more complex logic, extract to variables or helper functions.
+- Avoid excessive nesting of conditionals.
+- Use early return to simplify logic when appropriate.
+
+## State and Effects
+
+- All these components are SSR. Preact Hooks (useState, useEffect, useSignal, etc.) will NOT work properly.
+- Use vanilla JS + HTMX for client-side interactivity and state management.
+- Control state through hidden form inputs, data attributes, or HTMX attributes.
+
+## Performance
+
+- Avoid using external libs. Use Vanilla JS for Sliders, Drags, and other UX features.
+- Inject scripts using the `useScript` utility for dynamic functionality.
+- Use HTMX attributes for simple interactions and form submissions.
+
+
+### useId Utility
+
+The `useId` utility helps generate unique IDs for components to avoid conflicts:
+
+```tsx
+import { useId } from "../../sdk/useId.ts";
+```
+
+**Why use useId?**
+
+- As of July 2023, Fresh has a bug where Preact's `useId` returns the same ID for different islands
+- This creates duplicate IDs in the final markup, causing accessibility and functionality issues
+- `useId` uses a non-deterministic approach to prevent duplicate IDs
+
+**Usage:**
+
+```tsx
+export default function MyComponent() {
+  const id = useId(); // Generates unique ID like "button-123456"
+
+  return <button id={`button-${id}`}>Click me</button>;
+}
+```
+
+**Note:** The non-deterministic approach may cause hydration mismatches, but it's necessary to prevent duplicate IDs in SSR components.
+
+## Component Example
+
+```tsx
+import Icon from "../ui/Icon.tsx";
+import { clx } from "../../sdk/clx.ts";
+import { useScript } from "@deco/deco/hooks";
+import { useId } from "../../sdk/useId.ts";
+
+// Vanilla JS function for button interactions
+function handleButtonClick(buttonId: string) {
+  const button = document.getElementById(buttonId);
+  const checkbox = document.getElementById(
+    `${buttonId}-state`
+  ) as HTMLInputElement;
+
+  if (!button || !checkbox || button.hasAttribute("disabled")) return;
+
+  // Toggle the clicked state
+  checkbox.checked = true;
+  button.classList.add("animate-pulse");
+
+  // Reset after animation
+  setTimeout(() => {
+    checkbox.checked = false;
+    button.classList.remove("animate-pulse");
+  }, 200);
+}
+
+export interface ButtonProps {
+  /**
+   * Text to display inside the button
+   */
+  text: string;
+  /**
+   * Optional icon to display alongside text
+   */
+  icon?: string;
+  /**
+   * Button variant
+   */
+  variant?: "primary" | "secondary" | "outline";
+  /**
+   * Button size
+   */
+  size?: "small" | "medium" | "large";
+  /**
+   * Whether the button is disabled
+   */
+  disabled?: boolean;
+  /**
+   * Unique identifier for the button
+   */
+  id?: string;
+  /**
+   * HTMX attributes for interactions
+   */
+  htmxAttributes?: Record<string, string>;
+}
+
+export default function Button({
+  text,
+  icon,
+  variant = "primary",
+  size = "medium",
+  disabled = false,
+  id = `button-${useId()}`,
+  htmxAttributes = {},
+}: ButtonProps) {
+  return (
+    <>
+      {/* Hidden checkbox to control state */}
+      <input
+        type="checkbox"
+        id={`${id}-state`}
+        class="hidden"
+        checked={false}
+      />
+
+      {/* Injected script for button functionality */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(handleButtonClick, id),
+        }}
+      />
+
+      <button
+        id={id}
+        disabled={disabled}
+        aria-disabled={disabled}
+        class={clx(
+          "btn transition-all",
+          variant === "primary"
+            ? "btn-primary"
+            : variant === "secondary"
+            ? "btn-secondary"
+            : "btn-outline",
+          size === "small" ? "btn-sm" : size === "large" ? "btn-lg" : "",
+          disabled && "btn-disabled"
+        )}
+        hx-on:click={`handleButtonClick('${id}')`}
+        {...htmxAttributes}
+      >
+        {icon && <Icon id={icon} class="mr-2" />}
+        {text}
+      </button>
+    </>
+  );
+}
+```
+
+## Common Component Patterns
+
+### Loading States
+
+```tsx
+import { useScript } from "@deco/deco/hooks";
+import { useId } from "../../sdk/useId.ts";
+
+// Vanilla JS function for data loading
+function loadData(componentId: string, dataLoader: () => Promise<any>) {
+  const container = document.getElementById(componentId);
+  const loadingElement = document.getElementById(`${componentId}-loading`);
+  const dataElement = document.getElementById(`${componentId}-data`);
+
+  if (!container || !loadingElement || !dataElement) return;
+
+  // Show loading state
+  loadingElement.classList.remove("hidden");
+  dataElement.classList.add("hidden");
+
+  // Load data
+  dataLoader()
+    .then((result) => {
+      dataElement.textContent = result;
+      loadingElement.classList.add("hidden");
+      dataElement.classList.remove("hidden");
+    })
+    .catch((error) => {
+      console.error("Error loading data:", error);
+      loadingElement.textContent = "Error loading data";
+    });
+}
+
+export default function DataComponent({
+  dataLoader,
+  id = `data-${useId()}`,
+}: Props) {
+  return (
+    <>
+      {/* Injected script for data loading */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(loadData, id, dataLoader),
+        }}
+      />
+
+      <div id={id}>
+        <div id={`${id}-loading`} class="animate-pulse">
+          Loading...
+        </div>
+        <div id={`${id}-data`} class="hidden"></div>
+      </div>
+    </>
+  );
+}
+```
+
+### Error Boundaries
+
+```tsx
+import { useScript } from "@deco/deco/hooks";
+import { useId } from "../../sdk/useId.ts";
+
+// Vanilla JS function for error handling
+function handleError(componentId: string, error: Error) {
+  const container = document.getElementById(componentId);
+  const errorElement = document.getElementById(`${componentId}-error`);
+
+  if (!container || !errorElement) return;
+
+  errorElement.innerHTML = `
+    <div class="border border-red-300 rounded p-4 bg-red-50">
+      <h3 class="text-red-800 font-semibold">Something went wrong</h3>
+      <p class="text-red-600 text-sm mt-1">${error.message}</p>
+    </div>
+  `;
+  errorElement.classList.remove("hidden");
+}
+
+export interface ErrorBoundaryProps {
+  children: ComponentChildren;
+  fallback?: (error: Error) => string;
+  id?: string;
+}
+
+export default function ErrorBoundary({
+  children,
+  fallback,
+  id = `error-boundary-${useId()}`,
+}: ErrorBoundaryProps) {
+  return (
+    <>
+      {/* Injected script for error handling */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(handleError, id),
+        }}
+      />
+
+      <div id={id}>
+        <div id={`${id}-error`} class="hidden"></div>
+        {children}
+      </div>
+    </>
+  );
+}
+```
+
+### Form Components
+
+```tsx
+import { clx } from "../../sdk/clx.ts";
+import { useScript } from "@deco/deco/hooks";
+import { useId } from "../../sdk/useId.ts";
+
+// Vanilla JS function for form validation
+function validateField(fieldId: string) {
+  const field = document.getElementById(fieldId) as HTMLInputElement;
+  const errorElement = document.getElementById(`${fieldId}-error`);
+
+  if (!field || !errorElement) return;
+
+  const value = field.value.trim();
+  const isValid = field.checkValidity();
+
+  if (!isValid) {
+    errorElement.textContent = field.validationMessage;
+    errorElement.classList.remove("hidden");
+    field.classList.add("border-red-300");
+    field.classList.remove("border-gray-300");
+  } else {
+    errorElement.classList.add("hidden");
+    field.classList.remove("border-red-300");
+    field.classList.add("border-gray-300");
+  }
+}
+
+export interface FormFieldProps {
+  label: string;
+  name: string;
+  type?: "text" | "email" | "password" | "number";
+  required?: boolean;
+  placeholder?: string;
+  error?: string;
+  value?: string;
+  id?: string;
+  htmxAttributes?: Record<string, string>;
+}
+
+export default function FormField({
+  label,
+  name,
+  type = "text",
+  required = false,
+  placeholder,
+  error,
+  value = "",
+  id = name,
+  htmxAttributes = {},
+}: FormFieldProps) {
+  return (
+    <>
+      {/* Injected script for form validation */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(validateField, id),
+        }}
+      />
+
+      <div class="form-field mb-4">
+        <label
+          htmlFor={id}
+          class={clx(
+            "block text-sm font-medium mb-1",
+            error ? "text-red-700" : "text-gray-700"
+          )}
+        >
+          {label}
+          {required && <span class="text-red-500 ml-1">*</span>}
+        </label>
+
+        <input
+          id={id}
+          name={name}
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          required={required}
+          hx-on:blur={`validateField('${id}')`}
+          class={clx(
+            "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2",
+            error
+              ? "border-red-300 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
+          )}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : undefined}
+          {...htmxAttributes}
+        />
+
+        <p
+          id={`${id}-error`}
+          class={clx("text-red-600 text-sm mt-1", error ? "" : "hidden")}
+        >
+          {error || ""}
+        </p>
+      </div>
+    </>
+  );
+}
+```
+
+## Best Practices Summary
+
+### ✅ Do
+
+- Use semantic HTML elements
+- Implement proper TypeScript interfaces
+- Handle loading and error states with loaders
+- Add accessibility attributes
+- Keep components focused and small
+- Use consistent naming conventions
+- Document complex props with JSDoc
+- Use `useId` utility for generating unique component IDs
+- Use unique IDs for component instances
+- Follow SSR patterns (see `ssr.mdc` for details)
+
+### ❌ Don't
+
+- Use React/Preact hooks (useState, useEffect, useSignal, etc.)
+- Mutate props directly
+- Create deeply nested component hierarchies
+- Ignore accessibility requirements
+- Use `any` type extensively
+- Create monolithic components
+- Forget to handle edge cases
+- Try to use client-side state management
+- Use event handlers directly in JSX
+- Rely on component state for dynamic behavior
+
+
+### Component Organization
+```
+
+/components
+/ui
+Button.tsx
+Input.tsx
+Modal.tsx
+/layout
+Header.tsx
+Footer.tsx
+Sidebar.tsx
+/product
+ProductCard.tsx
+ProductGrid.tsx
+ProductDetails.tsx
+
+```
+
+```

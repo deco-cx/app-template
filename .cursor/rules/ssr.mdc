@@ -1,0 +1,209 @@
+---
+alwaysApply: false
+description: This file describes SSR patterns and script injection in Deco Framework.
+---
+
+# SSR Patterns in Deco Framework
+
+## Server-Side Rendering (SSR)
+
+Deco Framework uses server-side rendering for all components. This means:
+
+- All components are rendered on the server
+- No client-side state management with hooks
+- Use vanilla JS + HTMX for interactivity
+- Scripts are injected using `useScript` utility
+
+## Script Injection with useScript
+
+The `useScript` utility allows you to inject vanilla JS functions into components:
+
+```tsx
+import { useScript } from "@deco/deco/hooks";
+
+// Define your vanilla JS function
+function myScript(name: string) {
+  console.log("helloWorld", name);
+}
+
+// Use in component
+export default function MyComponent() {
+  return (
+    <>
+      {/* Inject script as module */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(myScript, "lucas"),
+        }}
+      />
+
+      {/* Use with HTMX events */}
+      <Button hx-on:click={useScript(myScript, "Gabriel")} text="Click me" />
+    </>
+  );
+}
+```
+
+### useScript Utility
+
+The `useScript` utility is already implemented in Deco Framework and can be imported from:
+
+```tsx
+import { useScript } from "@deco/deco/hooks";
+```
+
+This utility allows you to inject vanilla JS functions into components for client-side interactivity.
+
+
+## State Management in SSR
+
+### Hidden Input State Control
+
+Use hidden checkboxes or inputs to control component state:
+
+```tsx
+import { useScript } from "@deco/deco/hooks";
+import { useId } from "../../sdk/useId.ts";
+
+export default function ToggleButton({ text, id = `toggle-${useId()}` }: Props) {
+  return (
+    <>
+      {/* Hidden checkbox for state */}
+      <input type="checkbox" id={`${id}-state`} class="hidden" />
+
+      {/* Script to handle toggle */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(handleToggle, id),
+        }}
+      />
+
+      <button
+        id={id}
+        hx-on:click={`handleToggle('${id}')`}
+        class="btn"
+      >
+        {text}
+      </button>
+    </>
+  );
+}
+
+function handleToggle(toggleId: string) {
+  const checkbox = document.getElementById(`${toggleId}-state`) as HTMLInputElement;
+  const button = document.getElementById(toggleId);
+
+  if (checkbox && button) {
+    checkbox.checked = !checkbox.checked;
+    button.classList.toggle("active", checkbox.checked);
+  }
+}
+```
+
+### Data Attributes for State
+
+```tsx
+export default function Accordion({ title, content, id = `accordion-${useId()}` }: Props) {
+  return (
+    <>
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(handleAccordion, id),
+        }}
+      />
+
+      <div class="accordion">
+        <button
+          id={id}
+          hx-on:click={`handleAccordion('${id}')`}
+          class="accordion-header"
+          data-expanded="false"
+        >
+          {title}
+        </button>
+        <div id={`${id}-content`} class="accordion-content hidden">
+          {content}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function handleAccordion(accordionId: string) {
+  const button = document.getElementById(accordionId);
+  const content = document.getElementById(`${accordionId}-content`);
+  const isExpanded = button?.getAttribute("data-expanded") === "true";
+
+  if (button && content) {
+    button.setAttribute("data-expanded", (!isExpanded).toString());
+    content.classList.toggle("hidden", isExpanded);
+  }
+}
+```
+
+## Common SSR Patterns
+
+### Client-Side Interactivity
+
+```tsx
+export default function InteractiveComponent({ id = `interactive-${useId()}` }: Props) {
+  return (
+    <div id={id}>
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{
+          __html: useScript(handleInteraction, id),
+        }}
+      />
+      
+      <button
+        id={`${id}-button`}
+        hx-on:click={`handleInteraction('${id}')`}
+        class="btn btn-primary"
+      >
+        Click me
+      </button>
+      
+      <div id={`${id}-content`} class="hidden">
+        Interactive content here
+      </div>
+    </div>
+  );
+}
+
+function handleInteraction(componentId: string) {
+  const button = document.getElementById(`${componentId}-button`);
+  const content = document.getElementById(`${componentId}-content`);
+  
+  if (button && content) {
+    content.classList.toggle("hidden");
+    button.textContent = content.classList.contains("hidden") 
+      ? "Show" 
+      : "Hide";
+  }
+}
+```
+
+## Best Practices for SSR
+
+### ✅ Do
+
+- Use `useScript` for client-side functionality
+- Control state with hidden inputs or data attributes
+- Use unique IDs with `useId` utility
+- Keep vanilla JS functions simple and focused
+- Use semantic HTML elements
+- Implement proper accessibility attributes
+- Use HTMX for server interactions (see htmx.mdc)
+
+### ❌ Don't
+
+- Use React/Preact hooks (useState, useEffect, useSignal, etc.)
+- Try to manage complex client-side state
+- Use event handlers directly in JSX (use HTMX instead)
+- Create deeply nested component hierarchies
+- Ignore accessibility requirements
+- Use external libraries for simple interactions

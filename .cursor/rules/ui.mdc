@@ -1,0 +1,52 @@
+---
+description: This file describes UI components and utilities in Deco Framework.
+globs:
+alwaysApply: true
+---
+
+# UI Components in Deco Framework
+
+## Image Components
+
+### Image Component
+
+Use `Image`, instead of the `img` tag. `Image` receives the same props as the `img` tag.
+
+```tsx
+import Image from "apps/website/components/Image.tsx";
+
+<Image src="/path/to/image.jpg" alt="Description" width={300} height={200} />
+```
+
+### Picture and Source Components
+
+Use `Picture` and `Source`, instead of the `picture` and `source` tags. `Picture` and `Source` receives the same props as the `picture` and `source` tags.
+
+```tsx
+import Picture from "apps/website/components/Picture.tsx";
+import Source from "apps/website/components/Source.tsx";
+
+<Picture>
+  <Source media="(max-width: 768px)" srcset="/mobile-image.jpg" />
+  <Source media="(min-width: 769px)" srcset="/desktop-image.jpg" />
+  <img src="/fallback-image.jpg" alt="Description" />
+</Picture>
+```
+
+## Best Practices for UI Components
+
+### ✅ Do
+
+- Use `Image` component instead of `<img>` tags
+- Use `Picture` and `Source` for responsive images
+- Always provide `alt` text for accessibility
+- Use appropriate image dimensions
+- Optimize images for web performance
+
+### ❌ Don't
+
+- Use raw `<img>` tags
+- Use raw `<picture>` and `<source>` tags
+- Forget alt text for images
+- Use oversized images without optimization
+- Ignore responsive image requirements

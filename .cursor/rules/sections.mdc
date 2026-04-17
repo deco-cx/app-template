@@ -1,0 +1,456 @@
+---
+alwaysApply: false
+description: This file describe what is a Section, and how to use it.
+---
+### Sections
+
+- Sections are written in .tsx files and styled with TailwindCSS.
+- Sections can receive props from the CMS. If they do, create an interface `Props` for the Section
+- Sections are managed by the CMS user;
+- Sections can export loaders and actions inline, making this functions being called before rendering.
+
+Here an example of a Section with props:
+
+```tsx
+interface Props {
+  title: string;
+}
+
+export default function Section({ title = defaultProps.title }: Props) {
+  return <div>{title}</div>;
+}
+
+const defaultProps: Props = {
+  title: <generated>
+}
+```
+
+### Props
+
+- If the prop is an object, create another interface for that object, then use
+  that interface in the `Props` interface.
+  ```tsx
+  interface Sidebar {
+    maxItems: number;
+    position: "left" | "right";
+  }
+
+  interface Props {
+    title: string;
+    sidebar: Sidebar;
+  }
+  ```
+
+- If a prop is optional, use the `?` operator.
+  ```tsx
+  interface Props {
+    title: string;
+    highlight?: boolean;
+  }
+  ```
+
+- If the prop is an array, use `@titleBy` on top of the array's interface and
+  pass the name of the property that will be displayed in the CMS.
+  ```tsx
+  /**
+   * @titleBy name
+   */
+  interface User {
+    name: string;
+    id: string;
+  }
+
+  interface Props {
+    users: User[];
+  }
+  ```
+
+- You can use `@title` to change the prop's name, or `@description` to describe
+  the prop's behavior. Both `@title` and `@description` must be written in
+  Portuguese.
+  ```tsx
+  interface CustomOptions {
+    /**
+     * @title Primeira página do departamento
+     * @description Primeira página do departamento, se não for informado, a 0 será a primeira página
+     */
+    firstPLPPage: number;
+    /**
+     * @title Quantidade de produtos exibidos por página
+     */
+    productsPerPage: number;
+    /**
+     * @description Imagem exibida no mobile
+     */
+    mobile: ImageWidget;
+    /**
+     * @title Itens da barra de navegação
+     * @description Eles aparecerão quando o usuário arrastar o mouse para baixo
+     */
+    navbarItems: string[];
+  }
+
+  interface Props {
+    /**
+     * @title Condição para exibir a seção
+     */
+    matcher: string;
+    /**
+     * @title Preço mínimo para exibir o desconto
+     * @description Quanto a pessoa deve gastar para aparecer o desconto no carrinho
+     */
+    cartMinPrice: number;
+    /**
+     * @title Descreva a imagem
+     */
+    alt: ImageWidget;
+    /**
+     * @title Texto de sucesso
+     * @description Texto que será exibido depois que o usuário terminar uma compra
+     */
+    modelSuccessText: string;
+    /**
+     * @description Contagem regressiva que aparece em cima da seção
+     */
+    countdown: string;
+    /**
+     * @title Apenas para usuários logados?
+     * @description Se true, a seção vai aparecer apenas para usuários logados
+     */
+    onlyLoggedIn: boolean;
+    /**
+     * @title Intervalo do slider
+     * @description Intervalo de tempo para o slider mover para o próximo item
+     */
+    sliderInterval: number;
+    /**
+     * @title Quantidade de slides
+     */
+    sliderQuantity: number;
+    /**
+     * @title Arquivo CSV de redirects
+     * @description Redirects usados na página de departamento ou página de busca vazia
+     */
+    csv: string;
+    /**
+     * @title Quantidade de produtos
+     * @description Quantidade de produtos que vai aparecer na seção
+     */
+    productsQuantity: number;
+    /**
+     * @title Opções personalizadas
+     * @description Opções personalizadas para a seção
+     */
+    customOptions?: CustomOptions;
+  }
+  ```
+
+- To require a minimum number of items in an array, use `@minItems`. By default,
+  the minimum number of items is 1.
+  ```tsx
+  /**
+    * @minItems 10
+    */
+  products: Product[] | null;
+  ```
+
+- To limit the number of items in an array, use `@maxItems`.
+  ```tsx
+  /**
+    * @maxItems 10
+    */
+  products: Product[] | null;
+  ```
+
+### Mocked props
+
+Below Section, create mocked props with random values:
+
+- For images, use:
+  https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1818/ff6bb37e-0eab-40e1-a454-86856efc278e
+- For Product, always use the same product
+- For other types, fill with random values
+
+  ```tsx
+  interface Data {
+    id: string;
+    profileImage: ImageWidget;
+  }
+
+  interface Props {
+    name: string;
+    age: number;
+    data: Data;
+  }
+
+  export default function Section({
+      name = defaultProps.name,
+      age = defaultProps.age,
+      data = defaultProps.data
+    }: Props) {
+    return <div>{name} {age} {data.id} {data.profileImage}</div>;
+  }
+
+  const defaultProps: Props = {
+    name: <generated>,
+    age: <generated>,
+    data: <generated>
+  }
+  ```
+
+### Widgets
+
+- If the user want to build a PLP, categories page, search page, use
+  `ProductListingPage`.
+  ```tsx
+  import type { ProductListingPage } from "apps/commerce/types.ts";
+
+  interface Props {
+    page: ProductListingPage | null;
+  }
+  ```
+
+- If the user want to build a PDP, use `ProductDetailsPage`.
+  ```tsx
+  import type { ProductDetailsPage } from "apps/commerce/types.ts";
+
+  interface Props {
+    page: ProductDetailsPage | null;
+  }
+  ```
+
+- If the section will receive products, use `Product[]`.
+  ```tsx
+  import type { Product } from "apps/commerce/types.ts";
+
+  interface Props {
+    products: Product[] | null;
+  }
+  ```
+
+- Here an example of a Product
+  ```json
+  {
+    "@type": "Product",
+    "category": "Calçado>Tênis",
+    "productID": "3507008",
+    "url": "http://sites-fila-stor
+      -staging.decocdn.com/tenis-fila-racer-carbon-2-feminino-1241825/p?skuId=3507008",
+    "name": "33",
+    "alternateName": "RACER CARBON 2 W,FILA,FEMININO,RUNNING,TÊNIS,BRANCO/CINZA/PRATA,BLANCO/CINZA/PLATA,",
+    "description": "Desenvolvido como tênis de running para quebra de recordes",
+    "brand": {
+      "@type": "Brand",
+      "@id": "9",
+      "name": "Fila"
+    },
+    "inProductGroupWithID": "1241825",
+    "sku": "3507008",
+    "gtin": "7909943502745",
+    "releaseDate": 1722988800000,
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "cluster",
+        "value": "FILA30 Lifestyle",
+        "propertyID": "2384"
+      }
+    ],
+    "isVariantOf": {
+      "@type": "ProductGroup",
+      "productGroupID": "1241825",
+      "hasVariant": [
+        <... Product without isVariantOf>
+      ],
+      "url": "http://sites-fila-stor
+        -staging.decocdn.com/tenis-fila-racer-carbon-2-feminino-1241825/p",
+      "name": "Tênis Fila Racer Carbon 2 Feminino",
+      "additionalProperty": [
+        {
+          "@type": "PropertyValue",
+          "name": "Grupo",
+          "value": "Não Classificado",
+          "propertyID": "Especificações de produto",
+          "valueReference": "PROPERTY"
+        }
+      ],
+      "model": "F02R00102_6500_1241825"
+    },
+    "image": [
+      {
+        "@type": "ImageObject",
+        "alternateName": "",
+        "url": "https://fila.vtexassets.com/arquivos/ids/924115/F02R00102_6500.jpg?v=638586348493200000",
+        "name": "",
+        "encodingFormat": "image"
+      }
+    ],
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "BRL",
+      "highPrice": 1199.99,
+      "lowPrice": 1199.99,
+      "offerCount": 1,
+      "offers": [
+        {
+          "@type": "Offer",
+          "identifier": "default",
+          "price": 1199.99,
+          "seller": "1",
+          "sellerName": "fila",
+          "priceValidUntil": "2026-01-16T19:24:07Z",
+          "inventoryLevel": {
+            "value": 10000
+          },
+          "giftSkuIds": [],
+          "teasers": [],
+          "priceSpecification": [
+            {
+              "@type": "UnitPriceSpecification",
+              "priceType": "https://schema.org/SalePrice",
+              "priceComponentType": "https://schema.org/Installment",
+              "name": "American Express",
+              "description": "American Express à vista",
+              "billingDuration": 1,
+              "billingIncrement": 1199.99,
+              "price": 1199.99
+            }
+          ],
+          "availability": "https://schema.org/InStock"
+        }
+      ]
+    }
+  }
+  ```
+
+- To write long text, like a description or blog post, use `RichText` and set
+  the `dangerouslySetInnerHTML` attribute to render the text. The text is in
+  markdown format and will be rendered as HTML.
+  ```tsx
+  import type { RichText } from "apps/admin/widgets.ts";
+
+  interface Props {
+    text: RichText;
+  }
+
+  <div dangerouslySetInnerHTML={{ __html: text }} />;
+  ```
+
+- To receive an image, use `ImageWidget` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { ImageWidget } from "apps/admin/widgets.ts";
+
+  interface Props {
+    image: ImageWidget;
+  }
+  ```
+
+- To receive a Date, use `DateWidget` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { DateWidget } from "apps/admin/widgets.ts";
+
+  interface Props {
+    date: DateWidget;
+  }
+  ```
+
+- To receive a DateTime, use `DateTimeWidget` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { DateTimeWidget } from "apps/admin/widgets.ts";
+
+  interface Props {
+    date: DateTimeWidget;
+  }
+  ```
+
+- To receive a Color, use `Color` from `apps/admin/widgets.ts`
+  ```tsx
+  import type { Color } from "apps/admin/widgets.ts";
+
+  interface Props {
+    color: Color;
+  }
+  ```
+
+- To make an property be hide in CMS, use @ignore
+  ```tsx
+  interface Props {
+    /**
+    * @ignore
+    */
+    constantProp: "constantValue";
+  }
+  ```
+
+- The order of props in the interface is based on the position of the elements
+  in the section where these props will be used. For example, in a section that
+  has a title, image and description (in that order), the props order will be:
+  ```tsx
+  interface Props {
+    title: string;
+    image: ImageWidget;
+    description: string;
+  }
+  ```
+
+- Don't create custom types for `Product`, always use `Product[] | null` from
+  `apps/commerce/types.ts`
+
+### Utility functions
+
+
+- To format the price, use the `formatPrice`
+
+```ts
+function formatPrice(price: number, currency = "BRL", locale = "pt-BR") {
+  return new Intl.NumberFormat(locale, { style: "currency", currency }).format(
+    price,
+  );
+}
+```
+
+- Get product offers, like price, list price, inventory level, seller, etc.,
+  with `useOffer`
+  ```tsx
+  import type { Product } from "apps/commerce/types.ts";
+
+  function useOffer(product: Product) {
+    const offers = product.offers?.offers ?? [];
+
+    function lowestPrice<T extends { price: number }>(arr: T[]) {
+      return (
+        arr.reduce((acc, curr) => {
+          return acc.price < curr.price ? acc : curr;
+        }, arr[0]) ?? {}
+      );
+    }
+
+    const lowestOffer = lowestPrice(offers);
+
+    const {
+      inventoryLevel: { value: inventoryLevel = 0 },
+      price = 0,
+      seller = "1",
+      priceSpecification: priceSpec = [],
+      availability,
+    } = lowestOffer;
+
+    const listPrice =
+      priceSpec.find((spec) =>
+        spec.priceType === "https://schema.org/ListPrice"
+      )?.price ?? 0;
+
+    const lowestPriceSpec = lowestPrice(priceSpec);
+    const { billingDuration = 0, billingIncrement = 0 } = lowestPriceSpec;
+
+    return {
+      price,
+      listPrice,
+      availability,
+      inventoryLevel,
+      seller,
+      billingDuration,
+      billingIncrement,
+    };
+  }
+  ```

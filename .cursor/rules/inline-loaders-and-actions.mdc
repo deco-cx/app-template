@@ -1,0 +1,252 @@
+---
+alwaysApply: false
+description: This file explains what inline loaders and actions are and how to use them in Deco Framework.
+---
+
+# Inline Loaders and Actions in Deco Framework
+
+## What are Inline Loaders and Actions?
+
+Inline loaders and actions are server-side snippets that are executed within the exported section or component. They provide a way to handle data fetching and form submissions directly within your components, making them self-contained and reusable.
+
+## Inline Loaders
+
+### How Inline Loaders Work
+
+Inline loaders are **always executed before the section rendering**, and when a GET request is made to that section. They have complete access to the request object and Deco context.
+
+### Basic Structure
+
+```tsx
+import { type SectionProps } from "@deco/deco";
+
+export interface Props {
+  // Your component props
+}
+
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  // Server-side logic here
+  // Access to request and context
+  return { /* data to pass to component */ };
+};
+
+export default function MySection(props: SectionProps<ReturnType<typeof loader>>) {
+  // Component receives the loader's return value as props
+  return <div>{/* Your component JSX */}</div>;
+}
+```
+
+### Example: CategoryBanner
+
+```tsx
+// components/ui/CategoryBanner.tsx
+import { type SectionProps } from "@deco/deco";
+
+export const loader = (props: Props, req: Request) => {
+  const { banners } = { ...DEFAULT_PROPS, ...props };
+  const banner = banners.find(({ matcher }) =>
+    new URLPattern({ pathname: matcher }).test(req.url)
+  );
+  return { banner };
+};
+
+function Banner(props: SectionProps<ReturnType<typeof loader>>) {
+  const { banner } = props;
+  if (!banner) {
+    return null;
+  }
+  // Component receives the banner from loader
+  return <div>{banner.title}</div>;
+}
+
+export default Banner;
+```
+
+## Inline Actions
+
+### How Inline Actions Work
+
+Inline actions are executed when a POST request is made to the section or component. They can be used in both sections and components, and they trigger a re-render after execution.
+
+### Key Differences from Loaders
+
+1. **Execution Trigger**: Only executed on POST requests (not automatically on GET)
+2. **Usage**: Can be used in both sections and components
+3. **Re-rendering**: Component/section is re-rendered after action execution
+
+### Basic Structure
+
+```tsx
+export interface Props {
+  // Your component props
+}
+
+export const action = async (props: Props, req: Request, ctx: AppContext) => {
+  // Server-side logic here
+  // Handle form data, API calls, etc.
+  return { /* updated data */ };
+};
+
+export default function MyComponent(props: Awaited<ReturnType<typeof action>>) {
+  // Component receives the action's return value as props
+  return <div>{/* Your component JSX */}</div>;
+}
+```
+
+### Example: Out of Stock Notification
+
+```tsx
+// components/product/OutOfStock.tsx
+export const action = async (props: Props, req: Request, ctx: AppContext) => {
+  const form = await req.formData();
+  
+  const name = `${form.get("name") ?? ""}`;
+  const email = `${form.get("email") ?? ""}`;
+  
+  // deno-lint-ignore no-explicit-any
+  await (ctx as any).invoke("vtex/actions/notifyme.ts", {
+    skuId: props.productID,
+    name,
+    email,
+  });
+  
+  return props;
+};
+
+export default function Notify({ productID }: Props) {
+  return (
+    <form
+      class="form-control justify-start gap-2"
+      hx-sync="this:replace"
+      hx-indicator="this"
+      hx-swap="none"
+      hx-post={useComponent<Props>(import.meta.url, { productID })}
+    >
+      <span class="text-base">Este produto está indisponivel no momento</span>
+      <span class="text-sm">Avise-me quando estiver disponivel</span>
+      
+      <input placeholder="Nome" class="input input-bordered" name="name" />
+      <input placeholder="Email" class="input input-bordered" name="email" />
+      
+      <button type="button" class="btn btn-primary no-animation">
+        <span class="[.htmx-request_&]:hidden inline">Enviar</span>
+        <span class="[.htmx-request_&]:inline hidden loading loading-spinner loading-xs" />
+      </button>
+    </form>
+  );
+}
+```
+
+## Using useComponent for Actions
+
+The `useComponent` hook allows you to POST or GET to the same component, ensuring:
+
+- The component will be re-rendered
+- The inline action will be executed before re-rendering
+
+```tsx
+// POST to the same component
+hx-post={useComponent<Props>(import.meta.url, { productID })}
+```
+
+## Type Safety with Inline Functions
+
+### For Loaders
+
+```tsx
+import { type SectionProps } from "@deco/deco";
+
+// Component receives loader's return type
+export default function MySection(
+  props: SectionProps<ReturnType<typeof loader>>
+) {
+  // TypeScript knows the shape of props from loader
+  return <div>{props.data}</div>;
+}
+```
+
+### For Actions
+
+```tsx
+// Component receives action's return type
+export default function MyComponent(
+  props: Awaited<ReturnType<typeof action>>
+) {
+  // TypeScript knows the shape of props from action
+  return <div>{props.updatedData}</div>;
+}
+```
+
+### For Both Loader and Action
+
+```tsx
+import { ComponentProps } from "../../sections/Component.tsx";
+
+// When you have both loader and action
+export default function MyComponent(
+  props: ComponentProps<typeof loader, typeof action>
+) {
+  // TypeScript knows the combined shape
+  return <div>{props.data}</div>;
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use inline loaders for data fetching that needs to happen before rendering
+- Use inline actions for form submissions and data mutations
+- Always type your component props with the return type of your loader/action
+- Use `useComponent` for self-contained components with actions
+- Handle loading states with HTMX indicators
+- Use proper error handling in your server-side functions
+
+### ❌ Don't
+
+- Use inline loaders for client-side only data
+- Forget to handle form data extraction in actions
+- Ignore TypeScript types for better development experience
+- Use actions for simple data fetching (use loaders instead)
+- Forget to return data from your loader/action functions
+
+## Common Patterns
+
+### Form with Action
+
+```tsx
+export const action = async (props: Props, req: Request) => {
+  const form = await req.formData();
+  const data = Object.fromEntries(form.entries());
+  
+  // Process data
+  const result = await processData(data);
+  
+  return { ...props, result };
+};
+
+export default function FormComponent({ result }: Awaited<ReturnType<typeof action>>) {
+  return (
+    <form hx-post={useComponent<Props>(import.meta.url, {})}>
+      {/* Form fields */}
+    </form>
+  );
+}
+```
+
+### Data Fetching with Loader
+
+```tsx
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  const url = new URL(req.url);
+  const query = url.searchParams.get("q");
+  
+  const data = await ctx.invoke("my-loader", { query });
+  
+  return { ...props, data };
+};
+
+export default function DataComponent({ data }: Awaited<ReturnType<typeof loader>>) {
+  return <div>{/* Render data */}</div>;
+}
+```
